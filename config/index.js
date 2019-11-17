@@ -6,11 +6,23 @@ const path = require('path')
 
 module.exports = {
   dev: {
+    env: require('./dev.env'),
 
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    // proxy:'http://localhost:8081',
+    // proxyTable:{
+    //   '/api': {  // 匹配所有以 '/api' 开头的请求路径
+    //     target: 'http://localhost:8081/conf',  // 代理目标的基础路径
+    //     // target:'https://ronyun.com/xybz/conf',
+    //     changeOrigin: true,   // 支持跨域
+    //     //         // ws:true
+    //     pathRewrite: { // 重写路径： 去掉路径中开头的'/api'
+    //       '^/api': ''
+    //     }
+    //   }
+    // },
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
@@ -20,7 +32,7 @@ module.exports = {
     notifyOnErrors: true,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
 
-    
+
     /**
      * Source Maps
      */
@@ -43,7 +55,7 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/',
+    assetsPublicPath: './',
 
     /**
      * Source Maps

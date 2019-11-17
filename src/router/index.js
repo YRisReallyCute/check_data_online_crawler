@@ -1,21 +1,39 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
-import Test1 from '@/views/Test1'
+import HelloWorld from '../views/OnlineCrawler'
+import config from '../views/config'
+import table_test from "../views/table_test";
 
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
   routes: [
     {
-      path: '/',
+      path: '/:word/:where',
       name: 'HelloWorld',
-      component: HelloWorld
+      component: HelloWorld,
+      meta:{
+        title:'在线爬虫设置总页面'
+      }
     },
     {
-      path: '/Test1',
-      name: 'Test1',
-      component: Test1,
+      path: '/',
+      name: 'HelloWorld',
+      component: HelloWorld,
+      meta:{
+        title:'在线爬虫设置总页面'
+      }
+    },
+    {
+      path: '/config',
+      name: 'config',
+      component: config,
+      meta:{keepAlive: true,title: '在线爬虫配置页面'}
+    },
+    {
+      path: '/table_test',
+      name: 'table_test',
+      component: table_test,
       // meta:{keepAlive: true}
     }
   ]
