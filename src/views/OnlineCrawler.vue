@@ -45,7 +45,6 @@
 
       <el-tab-pane label="搜索管理">
         <el-card class="box-card">
-          <h2>搜索词汇</h2>
           <div class="search">
 
               <el-input
@@ -55,10 +54,10 @@
                 @keyup.enter.native="startSearch">
               </el-input>
 
-              <el-button type="primary" @click="startSearch">搜索并更新</el-button>
+              <el-button type="primary" @click="startSearch">搜索</el-button>
           </div>
 
-          <h4 align="center">选择搜索范围：</h4>
+<!--          <h4 align="center">选择搜索范围：</h4>-->
 
           <div class="setMargin">
             <el-checkbox-group v-model="checkList" >
@@ -77,20 +76,18 @@
 
         <div >
         <h4 @click="viewCurrentTaskStatus">搜索结果</h4>
+          <div class="right">
+            <el-button type="primary" size="small" @click="startRefresh(searchlist)">全部更新</el-button>
+          </div>
         <el-table class="tableTaskStatus" :data="tableTaskStatus">
-          <el-table-column label="任务编号" prop="id" align="center">
+          <el-table-column label="来源" prop="job_id" align="center">
             <template slot-scope="scope">
-              <span>{{scope.row.id}}</span>
+              <span>{{scrapyJobId2Group[scope.row.job_id]}}</span>
             </template>
           </el-table-column>
           <el-table-column label="搜索词" prop="word" align="center">
             <template slot-scope="scope">
               <span>{{scope.row.word}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="爬虫任务" prop="job_id" align="center">
-            <template slot-scope="scope">
-              <span>{{scrapyJobId2Name[scope.row.job_id]}}</span>
             </template>
           </el-table-column>
           <el-table-column label="任务组" prop="jobGroup" align="center">
@@ -103,6 +100,34 @@
               <span>{{taskStatus2ch[scope.row.status]}}</span>
             </template>
           </el-table-column>
+          <el-table-column label="更新" prop="jobGroup" align="center">
+            <template slot-scope="scope">
+              <el-button type="primary" size="small" @click="startRefresh(scope.row.id)">启动更新</el-button>
+            </template>
+          </el-table-column>
+
+          <el-table-column label="日志" prop="taskLog" align="center">
+            <template slot-scope="scope">
+              <el-tooltip :content="scope.row.taskLog" placement="bottom" effect="light">
+                  <el-button size="small">日志</el-button>
+              </el-tooltip>
+            </template>
+<!--            <el-popover-->
+<!--              placement="top-start"-->
+<!--              title="日志"-->
+<!--              width="200"-->
+<!--              trigger="hover"-->
+<!--              content="ffff">-->
+<!--              <span>日志</span>-->
+<!--            </el-popover>-->
+<!--            <template slot-scope="scope">-->
+<!--            </template>-->
+          </el-table-column>
+<!--          <el-table-column label="状态" prop="status" align="center">-->
+<!--            <template slot-scope="scope">-->
+<!--              <span>{{taskStatus2ch[scope.row.status]}}</span>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
         </el-table>
         </div>
 
@@ -121,60 +146,6 @@
         <br>
         <task_status :table-data="tableTaskStatus1" :table-data-title="tableTaskTitle" :tnum="taskTnum" @listenToChildEvent="handleTaskChild"></task_status>
       </el-tab-pane>
-
-<!--      <el-tab-pane label="数据查看">-->
-<!--        <div>-->
-<!--          <el-collapse v-model="activeNames" accordion>-->
-<!--            <el-collapse-item title="中医症状库" name="1" class="myfont">-->
-<!--              <el-table-->
-<!--                                :data="tableDataTemp"-->
-<!--                                stripe-->
-<!--                                style="width: 100%">-->
-
-<!--                                <el-table-column-->
-<!--                                  label="来源"-->
-<!--                                  align="center">-->
-<!--                                  <template slot-scope="scope">-->
-<!--                                    <el-button @click="handleClickBaike(scope.row.name)" type="text">{{scope.row.name}}</el-button>-->
-<!--                                  </template>-->
-<!--                                </el-table-column>-->
-
-<!--                                <el-table-column-->
-<!--                                  prop="totalNum"-->
-<!--                                  label="数据总数"-->
-<!--                                  align="center">-->
-<!--                                </el-table-column>-->
-
-<!--                                <el-table-column-->
-<!--                                  label="配置目录"-->
-<!--                                  align="center">-->
-<!--                                  <template slot-scope="scope">-->
-<!--                                    <el-button-->
-<!--                                      @click="handleEditContent(scope.row.name)">编辑配置文件</el-button>-->
-<!--                                  </template>-->
-<!--                                </el-table-column>-->
-
-<!--                                <el-table-column-->
-<!--                                  label="确定更改"-->
-<!--                                  align="center">-->
-<!--                                  <template slot-scope="scope">-->
-<!--                                    <el-button type="info" @click="viewLog(scope.row.log)">确定更改</el-button>-->
-<!--                                  </template>-->
-<!--                                </el-table-column>-->
-<!--                              </el-table>-->
-<!--            </el-collapse-item>-->
-
-<!--            <el-collapse-item title="中成药库" name="1" class="myfont">-->
-
-<!--            </el-collapse-item>-->
-
-<!--            <el-collapse-item title="中草药库" name="1" class="myfont">-->
-
-<!--            </el-collapse-item>-->
-<!--          </el-collapse>-->
-<!--        </div>-->
-
-<!--      </el-tab-pane>-->
 
       <el-tab-pane label="爬虫设置">
         <div>
@@ -463,6 +434,8 @@
         <el-button type="primary" @click="viewlogVisible = false">确 定</el-button>
       </span>
     </el-dialog>
+
+
   </div>
 </template>
 
@@ -529,6 +502,19 @@
                     {label:'URL',prop:'crawler_url',width:'240'}
                 ],
                 dbnamae:["symptom_zy","patent"],
+                type2ch:{
+                    1:"中医病",
+                    2:"西医病",
+                    3:"中医证型",
+                    4:"症状"
+                },
+                scrapyJobId2Group: {
+                    1: "百度百科",
+                    2: "中西医",
+                    3: "中西医",
+                    4: "中西医",
+                    5: "中西医"
+                },
                 scrapyJobId2Name:{
                     1:"百度百科",
                     2:"中医症状",
@@ -537,10 +523,11 @@
                     5:"西医疾病"
                 },
                 taskStatus2ch:{
-                    10:"等待更新",
-                    20:"等待插入",
+                    10:"已找到，待更新",
+                    20:"未找到，待插入",
                     1:"正在执行",
-                    11:"更新完成",
+                    11:"没有更新",
+                    12:"更新完成",
                     21:"插入完成"
                 },
                 dbname2ch:{
@@ -569,6 +556,31 @@
             }
         },
         methods:{
+            //启动某一行数据进行更新
+            startRefresh(id){
+                this.$axios.get('/refresh_task_idlist', {
+                    params: {
+                        idList: id,
+                    }
+                }).then(response => {
+                    console.log(response);
+                    if (response.data.code != "200") {
+                        // this.notFoundDialogVisible = true;
+                        alert("启动失败！");
+                    } else {
+                        this.viewTaskStatus();
+                        this.$message({
+                            type: "success",
+                            message: "任务创建成功！"
+                        });
+                        setTimeout(()=>{this.viewCurrentTaskStatus()},3000);
+                        setTimeout(()=>{this.viewCurrentTaskStatus()},10000);
+                    }
+                }).catch(error => {
+                    console.log(error)
+                });
+            },
+
             getUrlParams(){
                 let word=this.$route.params.word;
                 let where=this.$route.params.where;
@@ -609,8 +621,8 @@
                         console.log(response);
                         this.viewTaskStatus();
                         this.tableTaskStatus = response.data.result;
-                        setTimeout(this.viewCurrentTaskStatus(),3000);
-                        setTimeout(this.viewCurrentTaskStatus(),3000);
+                        // setTimeout(this.viewCurrentTaskStatus(),3000);
+                        // setTimeout(this.viewCurrentTaskStatus(),3000);
                     });
                 }).catch(error=>{
                     console.log(error)
@@ -668,6 +680,8 @@
                 }
             },
             viewCurrentTaskStatus(){
+                console.log("searchlist");
+                console.log(this.searchlist);
                 this.$axios.get('/task_status', {
                     params: {
                         idlist: this.searchlist
@@ -683,6 +697,24 @@
                     this.$alert("请输入内容");
                 }
                 else {
+                    // let clist="";
+                    // for (var i = 0; i < this.checkList.length; i++) {
+                    //     clist += this.checkList[i] + "/";
+                    // }
+                    // if(clist==""){
+                    //     this.$alert("请选择搜索范围");
+                    // }
+                    // else{
+                    //     this.$axios.get("/search_content",{
+                    //         params:{
+                    //             content:this.input1,
+                    //             chlist:clist
+                    //         }
+                    //     }).then(response=>{
+                    //         console.log(response);
+                    //         this.tableTaskStatus=response.data.result;
+                    //     })
+                    // }
                     var d=new Date();
                     var mytime="";
                     var month=d.getMonth()+1;
@@ -696,7 +728,7 @@
                         this.$alert("请选择搜索范围");
                     }
                     else {
-                        this.$axios.get('/search_save_content', {
+                        this.$axios.get('/search_content', {
                             params: {
                                 content: this.input1,
                                 chlist: clist
@@ -704,16 +736,13 @@
                         }).then(response => {
                             console.log(response);
                             if (response.data.code == "404") {
-                                this.notFoundDialogVisible = true;
+                                // this.notFoundDialogVisible = true;
+                                alert("没有找到！");
                             } else {
                                 this.viewTaskStatus();
-                                this.searchlist=response.data.idlist;
-                                this.$message({
-                                    type: "success",
-                                    message: "任务创建成功！"
-                                });
-                                setTimeout("this.viewCurrentTaskStatus()",3000);
-                                setTimeout(this.viewCurrentTaskStatus(),3000);
+                                this.searchlist=response.data.idList;
+                                console.log(this.searchlist);
+                                this.viewCurrentTaskStatus();
                             }
                         }).catch(error => {
                             console.log(error)
@@ -846,6 +875,11 @@
   }
   a {
     color: #42b983;
+  }
+
+  .right{
+    float:right ;
+    width: 30%;
   }
 
   .myfont >>> .el-collapse-item__header{
