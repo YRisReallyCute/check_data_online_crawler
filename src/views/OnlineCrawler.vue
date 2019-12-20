@@ -1,8 +1,8 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <h2>{{ $route.params.key }}</h2>
-    <el-dialog title="自动采集时间设置" :visible.sync="dialogFormVisible" width="30%">
+
+    <el-dialog title="自动采集时间设置" :visible.sync="dialogFormVisible" width="400px">
       <el-form>
         <el-form-item label="选择开始时间" label-width="30%">
           <el-time-select
@@ -41,14 +41,14 @@
     </el-dialog>
 
 
-    <el-tabs type="border-card">
+    <Tabs type="card">
 
-      <el-tab-pane label="搜索管理">
+      <TabPane label="搜索管理">
         <el-card class="box-card">
           <div class="search">
 
               <el-input
-                placeholder="请输入内容"
+                placeholder="请输入"
                 prefix-icon="el-icon-search"
                 v-model="input1"
                 @keyup.enter.native="startSearch">
@@ -57,42 +57,59 @@
               <el-button type="primary" @click="startSearch">搜索</el-button>
           </div>
 
-<!--          <h4 align="center">选择搜索范围：</h4>-->
-
+          <br>
           <div class="setMargin">
-            <el-checkbox-group v-model="checkList" >
-<!--              <el-checkbox v-for="item in dbnamae"-->
-<!--                           :key="item"-->
-<!--                           :label="dbname2ch[item]">-->
-<!--              </el-checkbox>-->
-              <el-checkbox key="disease_zy" label="中医病"></el-checkbox>
-              <el-checkbox key="disease_xy" label="西医病"></el-checkbox>
-              <el-checkbox key="symptom_zy" label="中医证型"></el-checkbox>
-              <el-checkbox key="symptom_xy" label="症状"></el-checkbox>
-              <el-checkbox key="patent" label="中成药"></el-checkbox>
-            </el-checkbox-group>
+
+            <CheckboxGroup v-model="checkList">
+              <Checkbox label="中医病">
+                <span>中医病</span>
+              </Checkbox>
+              <Checkbox label="西医病">
+                <span>西医病</span>
+              </Checkbox>
+              <Checkbox label="中医证型">
+                <span>中医证型</span>
+              </Checkbox>
+              <Checkbox label="症状">
+                <icon type="xx"></icon>
+                <span>症状&emsp;</span>
+              </Checkbox>
+              <Checkbox label="中成药">
+                <span>中成药</span>
+              </Checkbox>
+              <Checkbox label="中草药">
+                <span>中草药&emsp;</span>
+              </Checkbox>
+            </CheckboxGroup>
+
           </div>
         </el-card>
 
+        <br>
         <div >
-        <h4 @click="viewCurrentTaskStatus">搜索结果</h4>
+        <h3>搜索结果</h3>
           <div class="right">
-            <el-button type="primary" size="small" @click="startRefresh(searchlist)">全部更新</el-button>
+            <el-button @click="startRefreshAll()" type="primary" size="small" plain>全部更新</el-button>
           </div>
         <el-table class="tableTaskStatus" :data="tableTaskStatus">
-          <el-table-column label="来源" prop="job_id" align="center">
+          <el-table-column label="来源" prop="jobId" align="center">
             <template slot-scope="scope">
-              <span>{{scrapyJobId2Group[scope.row.job_id]}}</span>
+              <span>{{scrapyJobId2Group[scope.row.jobId]}}</span>
             </template>
           </el-table-column>
           <el-table-column label="搜索词" prop="word" align="center">
             <template slot-scope="scope">
-              <span>{{scope.row.word}}</span>
+              <div v-if="scope.row.status!=30 & scope.row.status!=20">
+                <el-button @click="locationToFrontened(scope.row)" plain>{{scope.row.word}}</el-button>
+              </div>
+              <div v-else>
+                <el-button  plain disabled>{{scope.row.word}}</el-button>
+              </div>
             </template>
           </el-table-column>
-          <el-table-column label="任务组" prop="jobGroup" align="center">
+          <el-table-column label="任务组" prop="type" align="center">
             <template slot-scope="scope">
-              <span>{{scope.row.jobGroup}}</span>
+              <span>{{type2ch[scope.row.type]}}</span>
             </template>
           </el-table-column>
           <el-table-column label="状态" prop="status" align="center">
@@ -102,38 +119,21 @@
           </el-table-column>
           <el-table-column label="更新" prop="jobGroup" align="center">
             <template slot-scope="scope">
-              <el-button type="primary" size="small" @click="startRefresh(scope.row.id)">启动更新</el-button>
+              <div v-if="scope.row.status!=30">
+                <el-button @click="startRefresh(scope.row)" type="primary" size="small" plain>启动更新</el-button>
+              </div>
+              <div v-else>
+                <el-button type="primary"  plain disabled>启动更新</el-button>
+              </div>
             </template>
           </el-table-column>
 
-          <el-table-column label="日志" prop="taskLog" align="center">
-            <template slot-scope="scope">
-              <el-tooltip :content="scope.row.taskLog" placement="bottom" effect="light">
-                  <el-button size="small">日志</el-button>
-              </el-tooltip>
-            </template>
-<!--            <el-popover-->
-<!--              placement="top-start"-->
-<!--              title="日志"-->
-<!--              width="200"-->
-<!--              trigger="hover"-->
-<!--              content="ffff">-->
-<!--              <span>日志</span>-->
-<!--            </el-popover>-->
-<!--            <template slot-scope="scope">-->
-<!--            </template>-->
-          </el-table-column>
-<!--          <el-table-column label="状态" prop="status" align="center">-->
-<!--            <template slot-scope="scope">-->
-<!--              <span>{{taskStatus2ch[scope.row.status]}}</span>-->
-<!--            </template>-->
-<!--          </el-table-column>-->
         </el-table>
         </div>
 
-      </el-tab-pane>
+      </TabPane>
 
-      <el-tab-pane label="任务状态">
+      <TabPane label="任务状态">
         <div class="search">
           <el-input
             placeholder="请输入内容"
@@ -145,9 +145,9 @@
 
         <br>
         <task_status :table-data="tableTaskStatus1" :table-data-title="tableTaskTitle" :tnum="taskTnum" @listenToChildEvent="handleTaskChild"></task_status>
-      </el-tab-pane>
+      </TabPane>
 
-      <el-tab-pane label="爬虫设置">
+      <TabPane label="爬虫设置">
         <div>
           <el-collapse v-model="activeNames" accordion>
 
@@ -372,22 +372,14 @@
 
           </el-collapse>
         </div>
-      </el-tab-pane>
+      </TabPane>
 
-    </el-tabs>
+    </Tabs>
 
 
     <el-dialog title="百度百科采集目录" :visible.sync="baikeDialogFormVisible" width="100%">
       <template>
-<!--        <el-row :gutter="20">-->
-<!--          <el-col :span="12" :offset="6"><div class="grid-content bg-purple">-->
-<!--            <el-input-->
-<!--              placeholder="请输入内容"-->
-<!--              prefix-icon="el-icon-search"-->
-<!--              v-model="input22">-->
-<!--            </el-input>-->
-<!--          </div></el-col>-->
-<!--        </el-row>-->
+
         <div class="search">
 
           <el-input
@@ -448,6 +440,7 @@
         components:{task_status, BaikeUrls},
         data () {
             return {
+                fruit:"",
                 searchlist:"",
                 searchBases:false,
                 viewlogVisible:false,
@@ -506,14 +499,21 @@
                     1:"中医病",
                     2:"西医病",
                     3:"中医证型",
-                    4:"症状"
+                    4:"症状",
+                    5:"中成药",
+                    6:"中成药"
                 },
                 scrapyJobId2Group: {
                     1: "百度百科",
                     2: "中西医",
                     3: "中西医",
                     4: "中西医",
-                    5: "中西医"
+                    5: "中西医",
+                    6:"药标网",
+                    7:"中医药宝典",
+                    8:"",
+                    9:"",
+                    10:"百度百科",
                 },
                 scrapyJobId2Name:{
                     1:"百度百科",
@@ -523,6 +523,7 @@
                     5:"西医疾病"
                 },
                 taskStatus2ch:{
+                    30:"未找到",
                     10:"已找到，待更新",
                     20:"未找到，待插入",
                     1:"正在执行",
@@ -556,31 +557,66 @@
             }
         },
         methods:{
-            //启动某一行数据进行更新
-            startRefresh(id){
-                this.$axios.get('/refresh_task_idlist', {
-                    params: {
-                        idList: id,
+            //点击词汇跳转到前端界面
+            locationToFrontened(rowData){
+                //已找到，待更新
+                if(rowData.status==10){
+                    let baseUrl="";
+                    if(rowData.jobId<6){
+                        baseUrl='https://ronyun.com/zxydata#/pages/info/info?item=';
                     }
-                }).then(response => {
-                    console.log(response);
-                    if (response.data.code != "200") {
-                        // this.notFoundDialogVisible = true;
-                        alert("启动失败！");
-                    } else {
-                        this.viewTaskStatus();
-                        this.$message({
-                            type: "success",
-                            message: "任务创建成功！"
-                        });
-                        setTimeout(()=>{this.viewCurrentTaskStatus()},3000);
-                        setTimeout(()=>{this.viewCurrentTaskStatus()},10000);
+                    else if(rowData.jobId<8){
+                        baseUrl='https://ronyun.com/zxydata#/pages/zyfj_info/zyfj_info?item=';
                     }
-                }).catch(error => {
-                    console.log(error)
-                });
-            },
+                    else{
 
+                    }
+                    let url=baseUrl+encodeURIComponent(JSON.stringify(rowData.item))+'&type='+this.type2ch[rowData.type];
+                    console.log(url);
+                    window.location.href=url;
+                }
+            },
+            //启动某一行数据进行更新
+            startRefresh(rowData){
+                if(rowData.status!=30) {
+                    this.$axios.get('/refresh_task', {
+                        params: {
+                            jobId: rowData.jobId,
+                            word: rowData.word,
+                            status: rowData.status,
+                            originId: rowData.originId,
+                            type: rowData.type
+                        }
+                    }).then(response => {
+                        console.log(response);
+                        if (response.data.code != "200") {
+                            // this.notFoundDialogVisible = true;
+                            alert("启动失败！");
+                        } else {
+                            this.viewTaskStatus();
+                            this.$message({
+                                type: "success",
+                                message: "任务创建成功！"
+                            });
+                            setTimeout(() => {
+                                this.viewCurrentTaskStatus(response.data.id,rowData)
+                            }, 3000);
+                            setTimeout(() => {
+                                this.viewCurrentTaskStatus(response.data.id,rowData)
+                            }, 10000);
+                        }
+                    }).catch(error => {
+                        console.log(error)
+                    });
+                }
+            },
+            //更新所有数据
+            startRefreshAll(){
+                let i=0;
+                for(;i<this.tableTaskStatus.length;i++){
+                    this.startRefresh(this.tableTaskStatus[i]);
+                }
+            },
             getUrlParams(){
                 let word=this.$route.params.word;
                 let where=this.$route.params.where;
@@ -679,16 +715,16 @@
                     })
                 }
             },
-            viewCurrentTaskStatus(){
-                console.log("searchlist");
-                console.log(this.searchlist);
+            viewCurrentTaskStatus(searchList,rowdata){
+
                 this.$axios.get('/task_status', {
                     params: {
-                        idlist: this.searchlist
+                        id: searchList
                     }
                 }).then(response => {
                     console.log(response);
-                    this.tableTaskStatus = response.data.result;
+                    // this.tableTaskStatus = response.data.result;
+                    rowdata.status=response.data.status;
                     this.viewTaskStatus();
                 });
             },
@@ -741,8 +777,9 @@
                             } else {
                                 this.viewTaskStatus();
                                 this.searchlist=response.data.idList;
+                                this.tableTaskStatus=response.data.result;
                                 console.log(this.searchlist);
-                                this.viewCurrentTaskStatus();
+                                // this.viewCurrentTaskStatus();
                             }
                         }).catch(error => {
                             console.log(error)
@@ -820,18 +857,18 @@
             },
             handleEditContent(val){
                 // console.log(symptom_values[scope.$index].radio)
-                console.log(val)
+                console.log(val);
                 if(val=="百度百科") {
                     this.$router.push("/config")
                 }
             },
             handleEditTime(index,row,str){
                 // console.log(symptom_values[scope.$index].radio)
-                console.log(str)
+                console.log(str);
                 console.log(index,row)
             },
             toggleSelection(rows){
-                console.log(rows)
+                console.log(rows);
                 if (rows) {
                     rows.forEach(row => {
                         this.$refs.multipleTable.toggleRowSelection(row);
@@ -853,8 +890,7 @@
             this.viewTaskStatus();
         },
         beforeRouteLeave(to,from,next){
-            to.meta.keepAlive=true
-            next()
+            to.meta.keepAlive=true;
         },
 
     }
@@ -864,6 +900,7 @@
 <style scoped>
   h1, h2 {
     font-weight: normal;
+    font-size: 22px;
   }
   ul {
     list-style-type: none;
@@ -880,11 +917,12 @@
   .right{
     float:right ;
     width: 30%;
+    min-width: 80px;
   }
 
   .myfont >>> .el-collapse-item__header{
     font-size: 18px;
-    font-family: Microsoft YaHei,"Avenir",Helvetica,Arial,sans-serif;
+    font-family: "Microsoft YaHei","Avenir",Helvetica,Arial,sans-serif;
     color: #66b1ff;
     alignment: center;
   }
@@ -916,6 +954,7 @@
 
   .search >>> .el-input{
     width: 30%;
+    min-width: 150px;
   }
   .el-icon-search:before{
     left: auto;
@@ -931,11 +970,11 @@
   }
 
   @media (max-width: 768px) {
-    .el-button--primary.is-plain {
-      width: 9%;
-      margin-left: 0;
-      font-size: 1px;
-    }
+    /*.el-button--primary.is-plain {*/
+    /*  width: 9%;*/
+    /*  margin-left: 0;*/
+    /*  font-size: 1px;*/
+    /*}*/
     .el-button--medium.is-round {
       padding: 5px 2px;
     }
@@ -951,6 +990,9 @@
   /* 小屏幕（平板，大于等于 768px） */
 
   @media (min-width: 768px) and (max-width: 991px) {
+    h1{
+      font-size: 22px;
+    }
     .hello{
       width: 100%;
       margin-left: auto;
@@ -969,6 +1011,7 @@
     .el-popover {
       width: 90%;
     }
+
   }
 
 

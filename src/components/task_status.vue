@@ -50,6 +50,12 @@
         </template>
       </el-table-column>
 
+      <el-table-column label="日志" prop="taskLog" align="center">
+        <template slot-scope="scope">
+          <el-button size="small" @click="viewLogContent(scope.row.taskLog)">日志</el-button>
+        </template>
+      </el-table-column>
+
 <!--      <template v-for="(item,index) in tableDataTitle">-->
 <!--        <el-table-column-->
 <!--          :key="index"-->
@@ -60,6 +66,22 @@
 <!--      </template>-->
     </el-table>
 
+<!--    <el-dialog-->
+<!--      title="日志"-->
+<!--      :visible.sync="dialogVisible"-->
+<!--      width="40%">-->
+<!--      <span>{{logContent}}</span>-->
+<!--      <span slot="footer" class="dialog-footer">-->
+<!--        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>-->
+<!--      </span>-->
+<!--    </el-dialog>-->
+
+    <Modal
+      v-model="dialogVisible"
+      title="日志"
+      width="400">
+        <span>{{logContent}}</span>
+    </Modal>
 
     <div class="block">
       <el-pagination
@@ -82,6 +104,8 @@
         props:["tableData","tableDataTitle","tnum"],
         data(){
             return{
+                dialogVisible:false,
+                logContent:"",
                 childpg:{
                     page:1,
                     size:10
@@ -91,7 +115,9 @@
                     2:"中医症状",
                     3:"西医症状",
                     4:"中医疾病",
-                    5:"西医疾病"
+                    5:"西医疾病",
+                    6:"药标网",
+                    7:"中医药宝典"
                 },
                 taskStatus2ch:{
                     10:"等待更新",
@@ -116,6 +142,11 @@
             }
         },
         methods:{
+            viewLogContent(log){
+                console.log(log);
+                this.logContent=log;
+                this.dialogVisible=true;
+            },
             filterStatus(value,row){
                 return this.taskStatus2ch[row.status] === value;
             },
@@ -135,4 +166,12 @@
 
 <style scoped>
 
+  .text-wrapper {
+    white-space: pre-wrap;
+  }
+
+  div{
+    white-space: pre-wrap;
+    text-align: left;
+  }
 </style>
