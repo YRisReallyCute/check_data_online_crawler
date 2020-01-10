@@ -9,14 +9,6 @@ Vue.use(Router);
 export default new Router({
   routes: [
     {
-      path: '/:word/:where',
-      name: 'HelloWorld',
-      component: HelloWorld,
-      meta:{
-        title:'在线爬虫设置总页面'
-      }
-    },
-    {
       path: '/',
       name: 'HelloWorld',
       component: HelloWorld,
@@ -25,10 +17,18 @@ export default new Router({
       }
     },
     {
-      path: '/config',
+      path: '/config/:jobGroup',
       name: 'config',
       component: config,
       meta:{keepAlive: true,title: '在线爬虫配置页面'}
+    },
+    {
+      path: '/:word/:where',
+      name: 'HelloWorld',
+      component: HelloWorld,
+      meta:{
+        title:'在线爬虫设置总页面'
+      }
     },
     {
       path: '/table_test',

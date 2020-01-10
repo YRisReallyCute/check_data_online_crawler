@@ -153,7 +153,7 @@
 
             <el-collapse-item title="中医症状库" name="1" class="myfont">
               <el-table
-                :data="tableData1"
+                :data="tableDataZxy"
                 stripe
                 style="width: 100%">
 
@@ -162,7 +162,7 @@
                   align="center"
                   width="180">
                   <template slot-scope="scope">
-                    <el-button @click="handleClickBaike(scope.row.name)" type="text">{{scope.row.name}}</el-button>
+                    <el-button @click="handleClickBaike(scope.row.jobGroup)" type="text">{{scope.row.name}}</el-button>
                   </template>
                 </el-table-column>
 
@@ -179,7 +179,7 @@
                   width="200">
                   <template slot-scope="scope">
                     <el-button
-                      @click="handleEditContent(scope.row.name)">编辑配置文件</el-button>
+                      @click="handleEditContent(scope.row.jobGroup)">编辑配置文件</el-button>
                   </template>
                 </el-table-column>
 
@@ -224,43 +224,40 @@
 
             <el-collapse-item title="中成药库" name="2" class="myfont">
               <el-table
-                :data="tableData2"
+                :data="tableDataPatent"
                 stripe
                 style="width: 100%">
 
                 <el-table-column
-                  prop="date"
                   label="来源"
                   align="center"
-                  width="130">
+                  width="180">
                   <template slot-scope="scope">
-                    <el-button @click="handleClickBaike()" type="text">{{scope.row.date}}</el-button>
+                    <el-button @click="handleClickBaike(scope.row.name)" type="text">{{scope.row.name}}</el-button>
                   </template>
                 </el-table-column>
 
                 <el-table-column
-                  prop="name"
+                  prop="totalNum"
                   label="数据总数"
                   align="center"
-                  width="90">
+                  width="120">
                 </el-table-column>
 
                 <el-table-column
-                  prop="name"
                   label="配置"
                   align="center"
-                  width="160">
+                  width="200">
                   <template slot-scope="scope">
                     <el-button
-                      @click="handleEditContent(scope.$index, scope.row, patent_values[scope.$index])">编辑配置文件</el-button>
+                      @click="handleEditContent(scope.row.jobGroup)">编辑配置文件</el-button>
                   </template>
                 </el-table-column>
 
                 <el-table-column
-                  prop="name"
                   label="时间设置"
                   align="center"
-                  width="160">
+                  width="200">
                   <template slot-scope="scope">
                     <el-button
                       @click="dialogFormVisible = true">设置采集时间</el-button>
@@ -272,69 +269,65 @@
                   align="center"
                   width="160">
                   <template slot-scope="scope">
-                    <el-radio v-model=scope.row.radio label="1">是</el-radio>
-                    <el-radio v-model=scope.row.radio label="2">否</el-radio>
+                    <el-radio v-model=scope.row.status label="1">是</el-radio>
+                    <el-radio v-model=scope.row.status label="0">否</el-radio>
                   </template>
                 </el-table-column>
 
                 <el-table-column
-                  prop="name"
                   label="立即启动"
                   align="center"
-                  width="160">
-                  <el-button type="primary">立即启动</el-button>
+                  width="240">
+                  <el-button type="primary" @click="handle_start">立即启动</el-button>
                 </el-table-column>
 
                 <el-table-column
-                  prop="name"
                   label="日志"
                   align="center"
-                  width="160">
-                  <el-button type="info">查看日志</el-button>
+                  width="180">
+                  <template slot-scope="scope">
+                    <el-button type="info" @click="viewLog(scope.row.log)">查看日志</el-button>
+                  </template>
                 </el-table-column>
-
               </el-table>
             </el-collapse-item>
 
             <el-collapse-item title="中草药库" name="3" class="myfont">
               <el-table
-                :data="tableData3"
+                :data="tableDataHerbal"
                 stripe
                 style="width: 100%">
 
                 <el-table-column
-                  prop="date"
                   label="来源"
                   align="center"
-                  width="130">
+                  width="180">
                   <template slot-scope="scope">
-                    <el-button @click="handleClickBaike()" type="text">{{scope.row.date}}</el-button>
+                    <el-button @click="handleClickBaike(scope.row.name)" type="text">{{scope.row.name}}</el-button>
                   </template>
                 </el-table-column>
 
                 <el-table-column
-                  prop="name"
+                  prop="totalNum"
                   label="数据总数"
                   align="center"
-                  width="90">
+                  width="120">
                 </el-table-column>
 
                 <el-table-column
-                  prop="name"
                   label="配置"
                   align="center"
-                  width="160">
+                  width="200">
                   <template slot-scope="scope">
                     <el-button
-                      @click="handleEditContent(scope.$index, scope.row, herbal_values[scope.$index])">编辑配置文件</el-button>
+                      @click="handleEditContent(scope.row.jobGroup)">编辑配置文件</el-button>
                   </template>
                 </el-table-column>
 
                 <el-table-column
-                  prop="name"
                   label="时间设置"
                   align="center"
-                  width="160">
+                  width="200">
                   <template slot-scope="scope">
                     <el-button
                       @click="dialogFormVisible = true">设置采集时间</el-button>
@@ -346,27 +339,26 @@
                   align="center"
                   width="160">
                   <template slot-scope="scope">
-                    <el-radio v-model=scope.row.radio label="1">是</el-radio>
-                    <el-radio v-model=scope.row.radio label="2">否</el-radio>
+                    <el-radio v-model=scope.row.status label="1">是</el-radio>
+                    <el-radio v-model=scope.row.status label="0">否</el-radio>
                   </template>
                 </el-table-column>
 
                 <el-table-column
-                  prop="name"
                   label="立即启动"
                   align="center"
-                  width="160">
-                  <el-button type="primary">立即启动</el-button>
+                  width="240">
+                  <el-button type="primary" @click="handle_start">立即启动</el-button>
                 </el-table-column>
 
                 <el-table-column
-                  prop="name"
                   label="日志"
                   align="center"
-                  width="160">
-                  <el-button type="info">查看日志</el-button>
+                  width="180">
+                  <template slot-scope="scope">
+                    <el-button type="info" @click="viewLog(scope.row.log)">查看日志</el-button>
+                  </template>
                 </el-table-column>
-
               </el-table>
             </el-collapse-item>
 
@@ -381,7 +373,6 @@
       <template>
 
         <div class="search">
-
           <el-input
             placeholder="请输入内容"
             prefix-icon="el-icon-search"
@@ -484,8 +475,9 @@
                 baikeDialogFormVisible:false,
                 value_time_gap: '',
                 baikeTableData: [],
-                tableData2:[],
-                tableData3:[],
+                tableDataZxy:[],
+                tableDataPatent:[],
+                tableDataHerbal:[],
                 tableDataTemp:[
                     {name:"百度百科",totalNum:"500"}
                 ],
@@ -494,7 +486,7 @@
                     {label:'疾病名称',prop:'info_mc',width:'240'},
                     {label:'URL',prop:'crawler_url',width:'240'}
                 ],
-                dbnamae:["symptom_zy","patent"],
+
                 type2ch:{
                     1:"中医病",
                     2:"西医病",
@@ -552,7 +544,6 @@
                 ],
                 msg: '易一医学健康资料在线更新系统',
                 activeNames: ['1'],
-                tableData1: [],
                 dialogFormVisible: false
             }
         },
@@ -573,7 +564,8 @@
                     }
                     let url=baseUrl+encodeURIComponent(JSON.stringify(rowData.item))+'&type='+this.type2ch[rowData.type];
                     console.log(url);
-                    window.location.href=url;
+                    // window.location.href=url;
+                    window.open(url);
                 }
             },
             //启动某一行数据进行更新
@@ -678,7 +670,9 @@
                 this.$axios.get('/get_dbname')
                     .then(response=>{
                         console.log(response);
-                        this.dbnamae=response.data.result;
+                        this.tableDataZxy=response.data.zxy;
+                        this.tableDataPatent=response.data.patent;
+                        this.tableDataHerbal=response.data.herbal;
                     })
             },
             viewTaskStatus(){
@@ -858,9 +852,14 @@
             handleEditContent(val){
                 // console.log(symptom_values[scope.$index].radio)
                 console.log(val);
-                if(val=="百度百科") {
-                    this.$router.push("/config")
-                }
+                window.location.assign('#/config/'+val);
+                window.location.reload();
+                // this.$router.push({
+                //     name:'config'
+                //     // params:{
+                //     //     jobGroup:val
+                //     // }
+                // })
             },
             handleEditTime(index,row,str){
                 // console.log(symptom_values[scope.$index].radio)

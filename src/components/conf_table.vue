@@ -22,6 +22,7 @@
         :prop="item.prop"
         :label="item.label"
         :width="item.width"
+        sortable
         align="center">
       </el-table-column>
     </template>
@@ -52,7 +53,7 @@
                 childpg:{
                     cnum: 1,
                     psize: 10,
-                }
+                },
             };
         },
         methods:{
@@ -61,7 +62,6 @@
             },
             handleSelectionChange(val){
                 this.multipleSelection = val;
-                console.log(this.multipleSelection);
                 this.$emit('listenChildren2',this.multipleSelection)
             },
             handleSizeChange(val) {

@@ -10,6 +10,7 @@ import 'view-design/dist/styles/iview.css';
 import VueAxios from 'vue-axios'
 import axios from 'axios'
 import qs from 'qs'
+import cnchar from 'cnchar'
 
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
@@ -18,9 +19,11 @@ Vue.use(VueAxios,axios);
 Vue.prototype.$axios = axios;
 // Vue.prototype.HOST = '/api'
 Vue.prototype.$qs=qs;
+
 // Vue.prototype.$http = axios
-// axios.defaults.baseURL = 'https://ronyun.com/xybz/conf';
-axios.defaults.baseURL='http://localhost:8081/conf';
+axios.defaults.baseURL = 'https://ronyun.com/xybz/conf';
+// axios.defaults.baseURL='http://localhost:8081/conf';
+
 
 /* eslint-disable no-new */
 new Vue({
