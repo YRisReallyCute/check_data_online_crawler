@@ -21,8 +21,8 @@ Vue.prototype.$axios = axios;
 Vue.prototype.$qs=qs;
 
 // Vue.prototype.$http = axios
-axios.defaults.baseURL = 'https://ronyun.com/xybz/conf';
-// axios.defaults.baseURL='http://localhost:8081/conf';
+// axios.defaults.baseURL = 'https://ronyun.com/xybz/conf';
+axios.defaults.baseURL='http://localhost:8081/conf';
 
 
 /* eslint-disable no-new */

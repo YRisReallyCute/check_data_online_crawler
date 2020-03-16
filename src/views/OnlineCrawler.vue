@@ -3,6 +3,7 @@
     <h1>{{ msg }}</h1>
 
     <el-dialog title="自动采集时间设置" :visible.sync="dialogFormVisible" width="400px">
+
       <el-form>
         <el-form-item label="选择开始时间" label-width="30%">
           <el-time-select
@@ -40,6 +41,12 @@
       </div>
     </el-dialog>
 
+    <el-dialog title="编辑地址" :visible.sync="editBaikeUrlVisiable" width="400px">
+      <Input v-model="editBaikeUrlInput"></Input>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="editBaikeUrlVisiable = false">确 定</el-button>
+      </div>
+    </el-dialog>
 
     <Tabs type="card">
 
@@ -94,7 +101,23 @@
         <el-table class="tableTaskStatus" :data="tableTaskStatus">
           <el-table-column label="来源" prop="jobId" align="center">
             <template slot-scope="scope">
+
               <span>{{scrapyJobId2Group[scope.row.jobId]}}</span>
+              <div v-if="scope.row.jobId==1|scope.row.jobId==10" style="font-size: 12px;color: #2baee9">
+
+                <el-tooltip class="item" effect="light" :content="scope.row.url" placement="top-end">
+                  <p @click="editBaikeUrl(scope.row)">[编辑地址]</p>
+                </el-tooltip>
+
+
+<!--                <el-popover-->
+<!--                  placement="right"-->
+<!--                  width="400"-->
+<!--                  trigger="click">-->
+<!--                  <Input v-model="scope.row.url"></Input>-->
+<!--                  <p @click="getReference">编辑地址</p>-->
+<!--                </el-popover>-->
+              </div>
             </template>
           </el-table-column>
           <el-table-column label="搜索词" prop="word" align="center">
@@ -435,6 +458,8 @@
                 searchlist:"",
                 searchBases:false,
                 viewlogVisible:false,
+                editBaikeUrlVisiable:false,
+                editBaikeUrlInput:"",
                 viewlog:"",
                 inputGap:"",
                 tableSearchPatentVisable: false ,
@@ -548,6 +573,26 @@
             }
         },
         methods:{
+            editBaikeUrl(input){
+                this.$prompt('请输入地址', '编辑采集地址', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    inputValue:input.url
+                    // inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
+                    // inputErrorMessage: '邮箱格式不正确'
+                }).then(({ value }) => {
+                    input.url=value;
+                    this.$message({
+                        type: 'success',
+                        message: '采集地址是：: ' + value,
+                    });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '取消输入'
+                    });
+                });
+            },
             //点击词汇跳转到前端界面
             locationToFrontened(rowData){
                 //已找到，待更新
@@ -570,15 +615,29 @@
             },
             //启动某一行数据进行更新
             startRefresh(rowData){
+                if(rowData.jobId==1|rowData.jobId==10){
+                    var paramstmp={
+                        jobId: rowData.jobId,
+                        word: rowData.word,
+                        status: rowData.status,
+                        originId: rowData.originId,
+                        type: rowData.type,
+                        refreshUrl:rowData.url
+                    };
+                }
+                else{
+                    var paramstmp={
+                        jobId: rowData.jobId,
+                        word: rowData.word,
+                        status: rowData.status,
+                        originId: rowData.originId,
+                        type: rowData.type
+                    };
+                }
+
                 if(rowData.status!=30) {
                     this.$axios.get('/refresh_task', {
-                        params: {
-                            jobId: rowData.jobId,
-                            word: rowData.word,
-                            status: rowData.status,
-                            originId: rowData.originId,
-                            type: rowData.type
-                        }
+                        params:paramstmp
                     }).then(response => {
                         console.log(response);
                         if (response.data.code != "200") {
