@@ -28,7 +28,9 @@
       <el-table-column label="状态"
                        prop="status"
                        align="center"
-                       :filters="[{text:'等待插入',value:'等待插入'},{text:'等待更新',value:'等待更新'},{text:'没有更新',value:'没有更新'},{text:'正在执行',value:'正在执行'},{text:'插入完成',value:'插入完成'},{text:'更新完成',value:'更新完成'}]"
+                       :filters="[{text:'等待插入',value:'等待插入'},{text:'等待更新',value:'等待更新'},{text:'没有更新',value:'没有更新'},
+                       {text:'正在执行',value:'正在执行'},{text:'插入完成',value:'插入完成'},{text:'更新完成',value:'更新完成'},
+                       {text:'未找到该词',value:'未找到该词'}]"
                        :filter-method="filterStatus"
                        filter-placement="bottom-end"
                        :filter-multiple="false">
@@ -117,7 +119,8 @@
                     4:"中医疾病",
                     5:"西医疾病",
                     6:"药标网",
-                    7:"中医药宝典"
+                    7:"中医药宝典",
+                    10:"百度百科"
                 },
                 taskStatus2ch:{
                     10:"等待更新",
@@ -125,14 +128,16 @@
                     1:"正在执行",
                     11:"没有更新",
                     12:"更新完成",
-                    21:"插入完成"
+                    21:"插入完成",
+                    40:"未找到该词"
                 },
                 statusTagType:{
                     10:"info",
                     20:"info",
                     1:"danger",
                     11:"success",
-                    21:"success"
+                    21:"success",
+                    40:"danger"
                 },
                 dbname2ch:{
                     "symptom_zy":"病症证型",
